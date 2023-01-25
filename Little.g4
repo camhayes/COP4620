@@ -12,6 +12,6 @@ INTLITERAL: [0-9]+;
 
 FLOATLITERAL: [0-9]* '.' [0-9]+;
 
-STRINGLITERAL: '"' .*? '"';
+STRINGLITERAL: '"' .*? '"';   //'"'. ~('=') '"';
 
-COMMENT: '--' .*? '\n';
+COMMENT: '--' .*? '\n';       //'--' .*? '\n' -> skip;

@@ -10,7 +10,7 @@ KEYWORD: 'PROGRAM'  | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' |
 
 OPERATOR: ':=' | '+' | '-' | '*' | '/' | '=' | '!=' | '<' | '>' | '(' | ')' | ';' | ',' | '<=' | '>=';
 
-IDENTIFIER: [a-zA-Z] [a-z-A-Z0-9]*;
+IDENTIFIER : [a-zA-Z][a-z-A-Z0-9]*;
 
 INTLITERAL: [0-9]+;
 

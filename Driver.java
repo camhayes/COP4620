@@ -39,12 +39,6 @@ public class Driver {
 			
 			
 		}
-		
-		//LittleParser parser = new LittleParser(tokens);
-		//ParseTree tree = parser(); // begin parsing at rule 'r'               //Remove/Replace for our grammer/code
-		
-		
-		System.out.println(); // print LISP-style tree
 	}
 
 }

@@ -1,5 +1,7 @@
 grammar Little;
 
+<----- LIAM START ----->
+
 program -> PROGRAM id BEGIN pgm_body END
 id -> IDENTIFIER
 pgm_body -> decl func_declarations
@@ -23,9 +25,12 @@ func_decl -> FUNCTION any_type id (param_decl_list) BEGIN
 func_body END
 func_body -> decl stmt_list
 
+
 stmt_list         -> stmt stmt_list | empty
 stmt              -> base_stmt | if_stmt | while_stmt
 base_stmt         -> assign_stmt | read_stmt | write_stmt | return_stmt
+
+<----- CAM START ----->
 
 assign_stmt       -> assign_expr ;
 assign_expr       -> id := expr
@@ -51,6 +56,9 @@ cond              -> expr compop expr
 compop            -> < | > | = | != | <= | >=
 
 while_stmt       -> WHILE ( cond ) decl stmt_list ENDWHILE
+
+
+<----- LEXER RULES ------->
 
 COMMENT: ('--' .*? '\r'? '\n') -> skip; // Skips comments which must be single line.
 

@@ -18,11 +18,10 @@ FLOATLITERAL: [0-9]* '.' [0-9]+;
 
 STRINGLITERAL: ( '"' ~('"')* '"');
 
-
 program: 'PROGRAM' id 'BEGIN' pgm_body 'END';
 id: IDENTIFIER;
 pgm_body: decl func_declarations;
-decl: string_decl decl | var_decl decl | "";
+decl: string_decl decl | var_decl decl | '';
 
 string_decl: 'STRING' id ':=' str ';' ;
 str: STRINGLITERAL;
@@ -31,7 +30,7 @@ var_decl: var_type id_list ';' ;
 var_type: 'FLOAT' | 'INT';
 any_type: var_type | 'VOID';
 id_list: id id_tail;
-id_tail: ',' id id_tail | "";
+id_tail: ',' id id_tail | '';
 
 param_decl_list: param_decl param_decl_tail | "";
 param_decl: var_type id;
@@ -47,9 +46,9 @@ base_stmt: assign_stmt | read_stmt | write_stmt | return_stmt;
 
 assign_stmt : assign_expr;
 assign_expr : IDENTIFIER OPERATOR expr;
-read_stmt : READ '(' id_list ')';
-write_stmt : WRITE '(' id_list ')';
-return_stmt : RETURN expr ;
+read_stmt : 'READ' '(' id_list ')';
+write_stmt : 'WRITE' '(' id_list ')';
+return_stmt : 'RETURN' expr ;
 
 expr: expr_prefix factor;
 expr_prefix : expr_prefix factor addop 
@@ -73,8 +72,8 @@ addop : '+'
 mulop : '*'
       | '/';
 
-if_stmt : IF '(' cond ')' decl stmt_list else_part ENDIF;
-else_part : ELSE decl stmt_list
+if_stmt : 'IF' '(' cond ')' decl stmt_list else_part 'ENDIF';
+else_part : 'ELSE' decl stmt_list
           | '';
 cond : expr compop expr;
 compop : '<' 
@@ -83,4 +82,4 @@ compop : '<'
        | '!='
        | '<='
        | '>=';
-while_stmt : WHILE '(' cond ')' decl stmt_list ENDWHILE;
+while_stmt : 'WHILE' '(' cond ')' decl stmt_list 'ENDWHILE';

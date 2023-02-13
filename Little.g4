@@ -1,6 +1,23 @@
 grammar Little;
 
-<----- LIAM START ----->
+COMMENT: ('--' .*? '\r'? '\n') -> skip; // Skips comments which must be single line.
+
+WS : [ \t\r\n]+ -> skip; // Skips all whitespace and tabs etc.
+
+KEYWORD: 'PROGRAM'  | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' |
+'WRITE' | 'IF' | 'ELSE' | 'ENDIF' | 'WHILE' | 'ENDWHILE' |
+'CONTINUE' | 'BREAK' | 'RETURN' | 'INT' | 'VOID' | 'STRING' | 'FLOAT';
+
+OPERATOR: ':=' | '+' | '-' | '*' | '/' | '=' | '!=' | '<' | '>' | '(' | ')' | ';' | ',' | '<=' | '>=';
+
+IDENTIFIER : ([a-z] | [A-Z])+ ([a-z] | [A-Z] | [0-9])*;
+
+INTLITERAL: [0-9]+;
+
+FLOATLITERAL: [0-9]* '.' [0-9]+;
+
+STRINGLITERAL: ( '"' ~('"')* '"');
+
 
 program: 'PROGRAM' id 'BEGIN' pgm_body 'END';
 id: IDENTIFIER;
@@ -28,50 +45,42 @@ stmt_list: stmt stmt_list | "";
 stmt: base_stmt | if_stmt | while_stmt;
 base_stmt: assign_stmt | read_stmt | write_stmt | return_stmt;
 
-<----- CAM START ----->
+assign_stmt : assign_expr;
+assign_expr : IDENTIFIER OPERATOR expr;
+read_stmt : READ '(' id_list ')';
+write_stmt : WRITE '(' id_list ')';
+return_stmt : RETURN expr ;
 
-assign_stmt       -> assign_expr ;
-assign_expr       -> id := expr
-read_stmt         -> READ ( id_list );
-write_stmt        -> WRITE ( id_list );
-return_stmt       -> RETURN expr ;
+expr: expr_prefix factor;
+expr_prefix : expr_prefix factor addop 
+            | '';
+factor : factor_prefix postfix_expr;
+factor_prefix : factor_prefix postfix_expr mulop
+              | '';
+postfix_expr : primary 
+             | call_expr;
+call_expr : id '(' expr_list ')';
+expr_list : expr expr_list_tail 
+          | '';
+expr_list_tail : ',' expr expr_list_tail 
+               | '';
+primary : '(' expr ')'
+        | id 
+        | INTLITERAL 
+        | FLOATLITERAL;
+addop : '+' 
+      | '-';
+mulop : '*'
+      | '/';
 
-expr              -> expr_prefix factor
-expr_prefix       -> expr_prefix factor addop | empty
-factor            -> factor_prefix postfix_expr
-factor_prefix     -> factor_prefix postfix_expr mulop | empty
-postfix_expr      -> primary | call_expr
-call_expr         -> id ( expr_list )
-expr_list         -> expr expr_list_tail | empty
-expr_list_tail    -> , expr expr_list_tail | empty
-primary           -> ( expr ) | id | INTLITERAL | FLOATLITERAL
-addop             -> + | -
-mulop             -> * | /
-
-if_stmt           -> IF ( cond ) decl stmt_list else_part ENDIF
-else_part         -> ELSE decl stmt_list | empty
-cond              -> expr compop expr
-compop            -> < | > | = | != | <= | >=
-
-while_stmt       -> WHILE ( cond ) decl stmt_list ENDWHILE
-
-
-<----- LEXER RULES ------->
-
-COMMENT: ('--' .*? '\r'? '\n') -> skip; // Skips comments which must be single line.
-
-WS : [ \t\r\n]+ -> skip; // Skips all whitespace and tabs etc.
-
-KEYWORD: 'PROGRAM'  | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' |
-'WRITE' | 'IF' | 'ELSE' | 'ENDIF' | 'WHILE' | 'ENDWHILE' |
-'CONTINUE' | 'BREAK' | 'RETURN' | 'INT' | 'VOID' | 'STRING' | 'FLOAT';
-
-OPERATOR: ':=' | '+' | '-' | '*' | '/' | '=' | '!=' | '<' | '>' | '(' | ')' | ';' | ',' | '<=' | '>=';
-
-IDENTIFIER : ([a-z] | [A-Z])+ ([a-z] | [A-Z] | [0-9])*;
-
-INTLITERAL: [0-9]+;
-
-FLOATLITERAL: [0-9]* '.' [0-9]+;
-
-STRINGLITERAL: ( '"' ~('"')* '"');
+if_stmt : IF '(' cond ')' decl stmt_list else_part ENDIF;
+else_part : ELSE decl stmt_list
+          | '';
+cond : expr compop expr;
+compop : '<' 
+       | '>'
+       | '='
+       | '!='
+       | '<='
+       | '>=';
+while_stmt : WHILE '(' cond ')' decl stmt_list ENDWHILE;

@@ -1,33 +1,21 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
-import java.io.*;
 
-public class Driver {
-
-
-    public static void main( String[] args) throws Exception
-    {
-
-        //String fileName = ""; //Add file path/name for your computer
-
-        InputStream inputStream = System.in;
-
-        @SuppressWarnings("deprecation")
-        ANTLRInputStream input = new ANTLRInputStream(inputStream);
-
-        Little lexer = new Little(input);
-
+public class Test {
+    public static void main(String[] args) throws Exception {
+        // create a CharStream that reads from standard input
+        ANTLRInputStream input = new ANTLRInputStream(System.in);
+        
+        // create a lexer that feeds off of input CharStream
+        ArrayInitLexer lexer = new ArrayInitLexer(input);
+        
+        // create a buffer of tokens pulled from the lexer
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        tokens.fill();
-
-        Vocabulary vocab = lexer.getVocabulary();
-
-        for(Token token: tokens.getTokens()) {
-            if (vocab.getSymbolicName(token.getType()) != "EOF") {
-                System.out.println("Token Type: " + vocab.getSymbolicName(token.getType()));
-                System.out.println("Value: " + token.getText());
-            }
-        }
+        
+        // create a parser that feeds off the tokens buffer
+        ArrayInitParser parser = new ArrayInitParser(tokens);
+        
+        ParseTree tree = parser.init(); // begin parsing at init rule
+        System.out.println(tree.toStringTree(parser)); // print LISP-style tree
     }
-
 }

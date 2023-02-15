@@ -1,23 +1,5 @@
 grammar Little;
 
-COMMENT: ('--' .*? '\r'? '\n') -> skip; // Skips comments which must be single line.
-
-WS : [ \t\r\n]+ -> skip; // Skips all whitespace and tabs etc.
-
-KEYWORD: 'PROGRAM'  | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' |
-'WRITE' | 'IF' | 'ELSE' | 'ENDIF' | 'WHILE' | 'ENDWHILE' |
-'CONTINUE' | 'BREAK' | 'RETURN' | 'INT' | 'VOID' | 'STRING' | 'FLOAT';
-
-OPERATOR: ':=' | '+' | '-' | '*' | '/' | '=' | '!=' | '<' | '>' | '(' | ')' | ';' | ',' | '<=' | '>=';
-
-IDENTIFIER : ([a-z] | [A-Z])+ ([a-z] | [A-Z] | [0-9])*;
-
-INTLITERAL: [0-9]+;
-
-FLOATLITERAL: [0-9]* '.' [0-9]+;
-
-STRINGLITERAL: ( '"' ~('"')* '"');
-
 program: 'PROGRAM' id 'BEGIN' pgm_body 'END';
 id: IDENTIFIER;
 pgm_body: decl func_declarations;
@@ -44,11 +26,11 @@ stmt_list: stmt stmt_list | ;
 stmt: base_stmt | if_stmt | while_stmt;
 base_stmt: assign_stmt | read_stmt | write_stmt | return_stmt;
 
-assign_stmt : assign_expr;
-assign_expr : IDENTIFIER OPERATOR expr;
-read_stmt : 'READ' '(' id_list ')';
-write_stmt : 'WRITE' '(' id_list ')';
-return_stmt : 'RETURN' expr ;
+assign_stmt : assign_expr ';';
+assign_expr : IDENTIFIER ':=' expr;
+read_stmt : 'READ' '(' id_list ')' ';';
+write_stmt : 'WRITE' '(' id_list ')' ';';
+return_stmt : 'RETURN' expr ';' ;
 
 expr: expr_prefix factor;
 expr_prefix : expr_prefix factor addop 
@@ -83,3 +65,21 @@ compop : '<'
        | '<='
        | '>=';
 while_stmt : 'WHILE' '(' cond ')' decl stmt_list 'ENDWHILE';
+
+COMMENT: ('--' .*? '\r'? '\n') -> skip; // Skips comments which must be single line.
+
+WS : [ \t\r\n]+ -> skip; // Skips all whitespace and tabs etc.
+
+KEYWORD: 'PROGRAM'  | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' |
+'WRITE' | 'IF' | 'ELSE' | 'ENDIF' | 'WHILE' | 'ENDWHILE' |
+'CONTINUE' | 'BREAK' | 'RETURN' | 'INT' | 'VOID' | 'STRING' | 'FLOAT';
+
+OPERATOR: ':=' | '+' | '-' | '*' | '/' | '=' | '!=' | '<' | '>' | '(' | ')' | ';' | ',' | '<=' | '>=';
+
+IDENTIFIER : ([a-z] | [A-Z])+ ([a-z] | [A-Z] | [0-9])*;
+
+INTLITERAL: [0-9]+;
+
+FLOATLITERAL: [0-9]* '.' [0-9]+;
+
+STRINGLITERAL: ( '"' ~('"')* '"');

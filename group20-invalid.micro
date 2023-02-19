@@ -1,0 +1,17 @@
+PROGRAM valid
+BEGIN
+	--Can you figure out what's wrong?
+	INT i = 0;
+	INT students = 100;
+
+	FUNCTION VOID main()
+
+	WHILE (i < students)
+		i := i + 1;
+		students = students - i;
+	ENDWHILE
+
+	WRITE(i);
+	WRITE(students);
+
+END

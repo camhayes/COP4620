@@ -1,0 +1,15 @@
+1.	All of the productions that exhibit left-recurision:
+•	decl: string_decl decl | var_decl decl | ;
+•	id_tail: ',' id id_tail | ;
+•	param_decl_tail: ',' param_decl param_decl_tail | ;
+•	func_declarations: func_decl func_declarations | ;
+•	stmt_list: stmt stmt_list | ;
+•	expr_prefix : expr_prefix factor addop | ;
+•	factor_prefix : factor_prefix postfix_expr mulop | ;
+•	expr_list_tail : ',' expr expr_list_tail | ;
+2.	In order to combat not knowing which operator is supposed to be in what order, 
+so ANTLR rewrites the left-recursive rule into a non-recursive rule using precedence 
+of previous operators to judge the precedence of the current operator. 
+A good example of this is for a grammar rule for an expression of basic arithmetic, (e.g. 5+3*(4-3)), 
+it would come out in the order (4-3), 3*(1), 5+3 = 8
+3.  

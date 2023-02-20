@@ -8,6 +8,9 @@ public class Driver {
 	public static void main( String[] args) throws Exception 
 	{
 		
+		/*
+		Files are all tested via command line and input stream should be initialized via system.in.
+
 		String fileName = "C:/Users/liamr/OneDrive/Desktop/Compilers/Step-2/Step2/inputs/test2.micro"; //Add file path/name for your computer
 		//String fileName = args[0];
 		File file = new File(fileName);
@@ -20,9 +23,10 @@ public class Driver {
 			System.out.println("Couldn't find file");
 			System.exit(1);
 		}
+		*/
 		
 		@SuppressWarnings("deprecation")
-		ANTLRInputStream input = new ANTLRInputStream(fis);
+		ANTLRInputStream input = new ANTLRInputStream(System.in);
 		
 		///////////////////////////////////////////////////////////
 

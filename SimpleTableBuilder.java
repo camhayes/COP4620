@@ -27,14 +27,16 @@ public class SimpleTableBuilder extends LittleBaseListener {
         if (type.compareTo("INT") == 0) {
         	String name = ctx.id_list().getText();
         	String[] int_val = ctx.id_list().getText().split(",");
-        	for(int i = 0;i < int_val.length; i++)
-            System.out.println(int_val[i] + ", " + type);
+        	for(int i = 0;i < int_val.length; i++) {
+        		System.out.println(int_val[i] + ", " + type);
+        	}
         }
         else if (type.compareTo("FLOAT") == 0) {
         	String name = ctx.id_list().getText();
         	String[] int_val = ctx.id_list().getText().split(",");
-        	for(int i = 0;i < int_val.length; i++)
-            System.out.println(int_val[i] + ", " + type);
+        	for(int i = 0;i < int_val.length; i++) {
+        		System.out.println(int_val[i] + ", " + type);
+        	}
         }
        
         // Next: Create symbol table using the information above and insert at the top of the stack

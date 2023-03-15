@@ -89,10 +89,28 @@ public class SimpleTableBuilder extends LittleBaseListener {
 	
 	int blockNum = 0;
 	
+	public boolean addStack(SymbolTable table) {
+		int check = 0;
+		for (SymbolTable symTable : stack) {
+	        if (symTable.scope.equals(table.scope)) {
+	           check = 1;
+	           
+	        }
+	    }
+		
+		if(check == 0){
+			stack.add(table);
+			return true;
+		}
+		return false;
+	}
+	
+	
     @Override public void enterProgram(LittleParser.ProgramContext ctx)
     {
     	SymbolTable global_table = new SymbolTable("GLOBAL");
     	table = global_table;
+    	addStack(table);
 
     }
     
@@ -143,24 +161,34 @@ public class SimpleTableBuilder extends LittleBaseListener {
     }
     
     @Override public void exitIf_stmt(LittleParser.If_stmtContext ctx) {
-    	table = stack.get(stack.size() - 2);
+    	if(addStack(table)) {
+    		table = stack.get(stack.size() - 2);
+    	}
+    	else {
+    		table = stack.get(stack.size() - 1);
+    	}
     }
     
     @Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) {
-    	stack.add(table);
+    	addStack(table);
     	SymbolTable block_table = new SymbolTable(getBlkName());
     	table = block_table;
     	
     }
     
     @Override public void exitWhile_stmt(LittleParser.While_stmtContext ctx) {
-    	stack.add(table);
-        table = stack.get(stack.size() - 2);
+    	if(addStack(table)) {
+    		table = stack.get(stack.size() - 2);
+    	}
+    	else {
+    		table = stack.get(stack.size() - 1);
+    	}
+        
     }
     
     @Override public void enterFunc_decl(LittleParser.Func_declContext ctx) {
     	
-    	stack.add(table);
+    	addStack(table);
     	
     	String name = ctx.id().getText();
     	SymbolTable func_table = new SymbolTable(name);
@@ -168,8 +196,24 @@ public class SimpleTableBuilder extends LittleBaseListener {
     }
     
     @Override public void exitFunc_decl(LittleParser.Func_declContext ctx) {
-    	table = stack.get(stack.size() - 2);
+    	if(addStack(table)) {
+    		table = stack.get(stack.size() - 2);
+    	}
+    	else {
+    		table = stack.get(stack.size() - 1);
+    	}
     }
+    
+    @Override public void enterParam_decl(LittleParser.Param_declContext ctx) { 
+    	String type = ctx.var_type().getText();
+        String name = ctx.id().getText();
+        Symbol symbol = new Symbol(name, type);
+        table.addSymbol(symbol);
+    }
+
+	@Override public void exitParam_decl(LittleParser.Param_declContext ctx) {
+		
+	}
     
     
     

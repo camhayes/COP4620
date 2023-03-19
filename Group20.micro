@@ -1,0 +1,39 @@
+PROGRAM GroupXX
+BEGIN
+	INT a,b,fe,j,i;
+	STRING str1 := "a equals b and c, they equal:";
+	STRING str2 := "a equals b, they equal:";
+	FUNCTION VOID printout (INT a,INT b,INT c)
+	BEGIN
+	IF (a = b)
+		IF(a = c)
+			WRITE(st1);
+			WRITE(a);
+		ELSE
+			WRITE(str2);
+			WRITE(a);
+		ENDIF
+	ELSE
+		WRITE (a);
+		WRITE (b);
+		WRITE (c);
+	ENDIF
+	END
+	FUNCTION INT main()
+	BEGIN
+	IF (a = b)
+		fe:=0;
+	ELSE
+
+	     WHILE (j<=10)
+			WHILE (i < 11)
+				fe := fe + 1;
+			ENDWHILE
+		     a := j;
+		     j := j + 1;		
+	     ENDWHILE
+
+	ENDIF
+	RETURN a+b;
+	END
+END

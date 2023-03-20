@@ -55,6 +55,7 @@ class Symbol{
 			String type = symbol.getType();
 			String valueString = symbol.getValue();
 			if(table.containsKey(name)) {
+				System.out.println("DECLARATION ERROR " + name);
 				throw new IllegalArgumentException("DECLARATION ERROR " + name);
 			}
 			else {
@@ -87,7 +88,7 @@ public class SimpleTableBuilder extends LittleBaseListener {
 	ArrayList<SymbolTable> stack = new ArrayList<SymbolTable>();
 	SymbolTable table = new SymbolTable("temp");
 	
-	int blockNum = 0;
+	int blockNum = 1;
 	
 	public boolean addStack(SymbolTable table) {
 		int check = 0;
@@ -168,6 +169,21 @@ public class SimpleTableBuilder extends LittleBaseListener {
     		table = stack.get(stack.size() - 1);
     	}
     }
+	@Override public void enterElse_part(LittleParser.Else_partContext ctx) {
+		stack.add(table);
+		SymbolTable block_table = new SymbolTable(getBlkName());
+		table = block_table;
+
+	}
+
+	@Override public void exitElse_part(LittleParser.Else_partContext ctx) {
+		if(addStack(table)) {
+			table = stack.get(stack.size() - 2);
+		}
+		else {
+			table = stack.get(stack.size() - 1);
+		}
+	}
     
     @Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) {
     	addStack(table);

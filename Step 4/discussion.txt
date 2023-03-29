@@ -1,0 +1,38 @@
+1. Which option do you prefer for your step 4 implementation - (1) generating code from ASTs or (2) generating code directly? Why?
+We think that implementing the code from ASTs will be the better implementation because it allows us to more easily traverse the AST nodes in order to generate our IR code. This will also allow us to address all different cases and optimization needs more easily.
+2. What is the tiny output for test1.micro when you type in your group number (hint: feed the test1.out to the tiny simulator and enter the above information twice as it awaits two inputs from the user)
+Output:
+20
+20
+60
+STATISTICS _____________________________
+   #Instructions:22
+    (move-ops mem:8, reglit:2)
+    ( int-ops mem:11, reglit:1)
+    (  fp-ops mem:0, reglit:0)
+   Memory Usage (mem:19,reg:33541653)
+      register-use[2,2,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+   Total Cycles = 49
+OTHER STATSvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    (int-ops:6, fp-ops:0)
+    (branches:0)
+      peephole-ops:0
+
+3. What is the total number of clock cycles for the 3 given test cases combined? (hint: you will have to run the tiny simulator with the 3 test cases separately and add up the "Total cycles" displayed in the outputs.)
+Test1: 49
+Test2: 83
+Test3: 59 
+
+4. Consider the following line of code (in LITTLE language): a:= b + c;. What is the corresponding IR (3AC) code? Assume integer variables. (Hint: IR code conventions are given in step4_instructions.pdf).
+
+ADDI b c $T1
+STOREI $T1 a
+
+5. Consider the following line of code (in LITTLE language): a:= b + c;. What is the corresponding tiny code? Assume integer variables. (Hint: tiny ISA is given in tinyDoc.txt).
+
+var a
+var b
+var c
+move b r1 # r1 = b
+addr c r1 # r1 = r1 (aka b) + c
+move r2 a # a = r1

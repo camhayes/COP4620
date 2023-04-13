@@ -19,11 +19,11 @@ public class Driver {
 
         ParseTreeWalker walker = new ParseTreeWalker();
 
-        ASTBuilder ast = new ASTBuilder();
+        Compiler ast = new Compiler();
 
         walker.walk(ast, tree);
-
-        ast.prettyPrint();
+        ast.printAST();
+        //ast.generateIR();
 
     }
 

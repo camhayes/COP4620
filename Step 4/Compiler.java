@@ -110,6 +110,16 @@ public class Compiler extends LittleBaseListener
         }
     }
 
+    public void printAST() {
+        for (int i = 0; i < ast.size(); i++)
+
+        {
+            // Clean up our AST to remove all null values
+            String prettify = ast.get(i).toString();
+            prettify = prettify.substring(0, prettify.length() - 1);
+            System.out.println(prettify);
+        }
+    }
     public ArrayList<CodeObject> generateIR() {
         ArrayList<CodeObject> IR = new ArrayList<CodeObject>();
         int tmpNum = 1;
@@ -133,7 +143,7 @@ public class Compiler extends LittleBaseListener
 
 
 
-                    IR.add(irNode);
+                    //IR.add(irNode);
 
                     break;
             }

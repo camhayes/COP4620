@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Compiler extends LittleBaseListener
 {
@@ -113,6 +114,7 @@ public class Compiler extends LittleBaseListener
     public ArrayList<CodeObject> generateIR() {
         ArrayList<CodeObject> IR = new ArrayList<CodeObject>();
         ArrayList<String> vars = new ArrayList<>(); // We want to maintain a list of variables that we have to declare at some point.
+        Hashtable<String, SymbolData> symbols = new Hashtable<>();
 
         int tmpNum = 1;
 
@@ -120,11 +122,11 @@ public class Compiler extends LittleBaseListener
             // We convert our nodes to a string, remove any null values and clean up the end.
             String prettify = ast.get(i).toString();
             prettify = prettify.substring(0, prettify.length() - 1 );
+            String[] inst = prettify.split(",");
+            int codeEval = inst.length;
             char firstChar = prettify.charAt(0);
             switch(firstChar) {
                 case '=' : // assignment statements
-                    String[] inst = prettify.split(",");
-                    int codeEval = inst.length;
                     // We have to differentiate between direct assignments and expressions
                     switch(codeEval) {
                         case 3 : // direct assignment to ID or String decl
@@ -148,10 +150,12 @@ public class Compiler extends LittleBaseListener
                                 IR.add(assignTempNode);
                                 IR.add(assignVarNode);
                                 tmpNum++;
-                            } else if (type.contains("STRING")) {
+                            } else if (inst[1].contains("STRING")) {
                                 // [=,STRING(var),"STRING"]
-                                // We send this to our vars table - need to figure this out...
-
+                                System.out.println("String here");
+                                String id = inst[1].substring(7, inst[1].length() - 1);
+                                SymbolData symboldata = new SymbolData("STRING", inst[2]);
+                                symbols.put(id, symboldata);
                             }
 
                             break; // end direct assignments
@@ -161,11 +165,34 @@ public class Compiler extends LittleBaseListener
                             break;
                     }
                     break;
+                case 'W': // Write statement [WRITE(var)]
+                    break;
+                case 'R': // Read and return statement
+                    if (prettify.contains("READ")) {
+                        System.out.println("Read statement here.");
+                    }
+                    break;
+                case 'I': // Int decl
+                    if (inst[0].contains("INT")) {
+                        String id = inst[0].substring(4, inst[0].length() - 1);
+                        SymbolData symbolData = new SymbolData("INT");
+                        symbols.put(id,symbolData);
+                    }
+                    break;
+                case 'F': // [FLOAT(id)]
+                    if (inst[0].contains("FLOAT")) {
+                        String id = inst[0].substring(6, inst[0].length() - 1);
+                        SymbolData symbolData = new SymbolData("FLOAT");
+                        symbols.put(id,symbolData);
+                    }
+
+                    break;
             }
         }
         for (int i = 0; i < IR.size(); i++) {
             System.out.println(IR.get(i).toString());
         }
+
 
         return IR;
     }
@@ -232,6 +259,18 @@ class CodeObject {
         string += opOne != null ? this.opOne + ' ' : "";
         string += opTwo != null ? this.opTwo + ' ' : "";
         string += result != null ? this.result + ' ' : "";
-        return string;
+        return ";" + string;
+    }
+}
+
+class SymbolData {
+    String type;
+    String data;
+    public SymbolData(String type) {
+        this.type = type;
+    }
+    public SymbolData(String type, String data) {
+        this.type = type;
+        this.data = data;
     }
 }

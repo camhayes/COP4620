@@ -110,22 +110,14 @@ public class Compiler extends LittleBaseListener
         }
     }
 
-    public void printAST() {
-        for (int i = 0; i < ast.size(); i++)
-
-        {
-            // Clean up our AST to remove all null values
-            String prettify = ast.get(i).toString();
-            prettify = prettify.substring(0, prettify.length() - 1);
-            System.out.println(prettify);
-        }
-    }
     public ArrayList<CodeObject> generateIR() {
         ArrayList<CodeObject> IR = new ArrayList<CodeObject>();
+        ArrayList<String> vars = new ArrayList<>(); // We want to maintain a list of variables that we have to declare at some point.
+
         int tmpNum = 1;
 
         for (int i = 0; i < ast.size(); i++) {
-            // Clean up our AST to remove all null values
+            // We convert our nodes to a string, remove any null values and clean up the end.
             String prettify = ast.get(i).toString();
             prettify = prettify.substring(0, prettify.length() - 1 );
             char firstChar = prettify.charAt(0);
@@ -135,30 +127,48 @@ public class Compiler extends LittleBaseListener
                     int codeEval = inst.length;
                     // We have to differentiate between direct assignments and expressions
                     switch(codeEval) {
-                        case 3 :
-                            CodeObject irNode = new CodeObject(inst[0], generateTemp(tmpNum));
-                            tmpNum++;
+                        case 3 : // direct assignment to ID or String decl
+                            String type = inst[2];
+                            if (type.contains("INTLITERAL")) {
+                                // ex: [=,ID(var),INTLITERAL(3)]
+                                String id = inst[1].substring(3, inst[1].length() - 1);
+                                String literal = inst[2].substring(11, inst[2].length() - 1);
+                                CodeObject assignTempNode = new CodeObject("STOREI", literal, "$T" + tmpNum);
+                                CodeObject assignVarNode = new CodeObject("STOREI", "$T" + tmpNum, id);
+                                IR.add(assignTempNode);
+                                IR.add(assignVarNode);
+                                tmpNum++;
+
+                            } else if (type.contains("FLOATLITERAL")) {
+                                // ex: [=,ID(var),FLOATLITERAL(3)]
+                                String id = inst[1].substring(3, inst[1].length() - 1);
+                                String literal = inst[2].substring(13, inst[2].length() - 1);
+                                CodeObject assignTempNode = new CodeObject("STOREF", literal, "$T" + tmpNum);
+                                CodeObject assignVarNode = new CodeObject("STOREF", "$T" + tmpNum, id);
+                                IR.add(assignTempNode);
+                                IR.add(assignVarNode);
+                                tmpNum++;
+                            } else if (type.contains("STRING")) {
+                                // [=,STRING(var),"STRING"]
+                                // We send this to our vars table - need to figure this out...
+
+                            }
+
+                            break; // end direct assignments
+                        case 5: // Assignment statements with expressions
+                            // [=,ID(var),OPCODE,OPERAND1,OPERAND2]
+
                             break;
                     }
-
-
-
-                    //IR.add(irNode);
-
                     break;
             }
-
-
         }
-
+        for (int i = 0; i < IR.size(); i++) {
+            System.out.println(IR.get(i).toString());
+        }
 
         return IR;
     }
-
-    public String generateTemp (int tmpNum){
-        return "$T" + tmpNum;
-    }
-
 
 }
 class Node {
@@ -214,5 +224,14 @@ class CodeObject {
     public CodeObject(String opcode, String result) {
         this.opcode = opcode;
         this.result = result;
+    }
+
+    public String toString() {
+        String string = "";
+        string += opcode != null ? this.opcode + ' ' : "";
+        string += opOne != null ? this.opOne + ' ' : "";
+        string += opTwo != null ? this.opTwo + ' ' : "";
+        string += result != null ? this.result + ' ' : "";
+        return string;
     }
 }

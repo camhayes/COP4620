@@ -22,8 +22,8 @@ public class Driver {
         Compiler ast = new Compiler();
 
         walker.walk(ast, tree);
-        ast.printAST();
-        //ast.generateIR();
+        //ast.printAST();
+        ast.generateIR();
 
     }
 

@@ -165,7 +165,24 @@ public class Compiler extends LittleBaseListener
                             break;
                     }
                     break;
-                case 'W': // Write statement [WRITE(var)]
+                case 'W' : // write statements
+                	String varPrint = prettify.substring(prettify.indexOf('(') + 1, prettify.indexOf(')'));
+                	
+                	SymbolData result = symbols.get(varPrint);
+                	
+                	if (result.type.equals("STRING")) {
+                        CodeObject assignVarNode = new CodeObject("WRITES", varPrint);
+                        IR.add(assignVarNode);
+                	}
+                	else if (result.type.equals("INT")) {
+                        CodeObject assignVarNode = new CodeObject("WRITEI", varPrint);
+                        IR.add(assignVarNode);
+                	}
+                	else if (result.type.equals("FLOAT")) {
+                        CodeObject assignVarNode = new CodeObject("WRITEF", varPrint);
+                        IR.add(assignVarNode);
+                	}
+                	
                     break;
                 case 'R': // Read and return statement
                     if (prettify.contains("READ")) {

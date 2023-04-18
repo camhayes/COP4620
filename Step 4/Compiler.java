@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 public class Compiler extends LittleBaseListener
 {
@@ -118,6 +119,10 @@ public class Compiler extends LittleBaseListener
 
         int tmpNum = 1;
 
+        IR.add(new CodeObject("IR", "CODE"));
+        IR.add(new CodeObject("LABEL", "main"));
+        IR.add(new CodeObject("LINK", ""));
+
         for (int i = 0; i < ast.size(); i++) {
             // We convert our nodes to a string, remove any null values and clean up the end.
             String prettify = ast.get(i).toString();
@@ -152,7 +157,6 @@ public class Compiler extends LittleBaseListener
                                 tmpNum++;
                             } else if (inst[1].contains("STRING")) {
                                 // [=,STRING(var),"STRING"]
-                                System.out.println("String here");
                                 String id = inst[1].substring(7, inst[1].length() - 1);
                                 SymbolData symboldata = new SymbolData("STRING", inst[2]);
                                 symbols.put(id, symboldata);
@@ -161,6 +165,35 @@ public class Compiler extends LittleBaseListener
                             break; // end direct assignments
                         case 5: // Assignment statements with expressions
                             // [=,ID(var),OPCODE,OPERAND1,OPERAND2]
+                        	
+                        	String[] expression = parseString(prettify);
+                        	String varPrint = prettify.substring(prettify.indexOf('(') + 1, prettify.indexOf(')'));
+                        	
+                        	SymbolData result = symbols.get(varPrint);
+                        	char typeE = result.type.charAt(0);
+                        	
+                        	if(expression[1].equals("*")) {
+                        		CodeObject assignTempNode = new CodeObject("MULT" + typeE, expression[2], expression[3], "$T" + tmpNum);
+                                CodeObject assignVarNode = new CodeObject("STORE" + typeE, "$T" + tmpNum, expression[0]);
+                                IR.add(assignTempNode);
+                                IR.add(assignVarNode);
+                                tmpNum++;
+                        	}
+                        	else if(expression[1].equals("+")) {
+                
+                        		CodeObject assignTempNode = new CodeObject("ADD" + typeE, expression[2], expression[3], "$T" + tmpNum);
+                                CodeObject assignVarNode = new CodeObject("STORE" + typeE, "$T" + tmpNum, expression[0]);
+                                IR.add(assignTempNode);
+                                IR.add(assignVarNode);
+                                tmpNum++;
+                        	}
+                        	else if(expression[1].equals("-")) {
+                        		CodeObject assignTempNode = new CodeObject("SUB" + typeE, expression[2], expression[3], "$T" + tmpNum);
+                                CodeObject assignVarNode = new CodeObject("STORE" + typeE, "$T" + tmpNum, expression[0]);
+                                IR.add(assignTempNode);
+                                IR.add(assignVarNode);
+                                tmpNum++;
+                        	}
 
                             break;
                     }
@@ -186,7 +219,27 @@ public class Compiler extends LittleBaseListener
                     break;
                 case 'R': // Read and return statement
                     if (prettify.contains("READ")) {
-                        System.out.println("Read statement here.");
+                    	
+                        varPrint = prettify.substring(prettify.indexOf('(') + 1, prettify.indexOf(')'));
+                    	result = symbols.get(varPrint);
+                    	
+                    	if (result.type.equals("STRING")) {
+                            CodeObject assignVarNode = new CodeObject("READS", varPrint);
+                            IR.add(assignVarNode);
+                    	}
+                    	else if (result.type.equals("INT")) {
+                            CodeObject assignVarNode = new CodeObject("READI", varPrint);
+                            IR.add(assignVarNode);
+                    	}
+                    	else if (result.type.equals("FLOAT")) {
+                            CodeObject assignVarNode = new CodeObject("READF", varPrint);
+                            IR.add(assignVarNode);
+                    	}
+                    	
+                    }
+                    else if (prettify.contains("RETURN")){
+                    	CodeObject assignVarNode = new CodeObject("RET","");
+                        IR.add(assignVarNode);
                     }
                     break;
                 case 'I': // Int decl
@@ -213,6 +266,24 @@ public class Compiler extends LittleBaseListener
 
         return IR;
     }
+    public static String[] parseString(String input) {
+        String[] tokens = input.split(",");
+        List<String> outputList = new ArrayList<String>();
+
+        for (int i = 1; i < tokens.length; i++) {
+            String token = tokens[i];
+            if (token.startsWith("ID(")) {
+                outputList.add(token.substring(3, token.length() - 1));
+            } else if (token.equals("*") || token.equals("+")) {
+                outputList.add(token);
+            }
+        }
+
+        String[] output = new String[outputList.size()];
+        output = outputList.toArray(output);
+        return output;
+    }
+
 
 }
 class Node {
@@ -278,6 +349,8 @@ class CodeObject {
         string += result != null ? this.result + ' ' : "";
         return ";" + string;
     }
+    
+    
 }
 
 class SymbolData {
@@ -290,4 +363,5 @@ class SymbolData {
         this.type = type;
         this.data = data;
     }
+    
 }

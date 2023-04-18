@@ -1,10 +1,13 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 public class Compiler extends LittleBaseListener
 {
     ArrayList<Node> ast = new ArrayList<>();
+    static Hashtable<String, SymbolData> symbols = new Hashtable<>();
     Node current;
 
     @Override public void enterFunc_decl(LittleParser.Func_declContext ctx) {
@@ -111,11 +114,15 @@ public class Compiler extends LittleBaseListener
             ast.add(current);
         }
     }
+    public void astOut() {
+        for (int i = 0; i < ast.size(); i++) {
+            System.out.println(ast.get(i).toString());
+        }
+    }
 
     public ArrayList<CodeObject> generateIR() {
         ArrayList<CodeObject> IR = new ArrayList<CodeObject>();
-        ArrayList<String> vars = new ArrayList<>(); // We want to maintain a list of variables that we have to declare at some point.
-        Hashtable<String, SymbolData> symbols = new Hashtable<>();
+
 
         int tmpNum = 1;
 
@@ -179,6 +186,13 @@ public class Compiler extends LittleBaseListener
                                 IR.add(assignVarNode);
                                 tmpNum++;
                         	}
+                            else if(expression[1].equals("/")) {
+                                CodeObject assignTempNode = new CodeObject("DIV" + typeE, expression[2], expression[3], "$T" + tmpNum);
+                                CodeObject assignVarNode = new CodeObject("STORE" + typeE, "$T" + tmpNum, expression[0]);
+                                IR.add(assignTempNode);
+                                IR.add(assignVarNode);
+                                tmpNum++;
+                            }
                         	else if(expression[1].equals("+")) {
                 
                         		CodeObject assignTempNode = new CodeObject("ADD" + typeE, expression[2], expression[3], "$T" + tmpNum);
@@ -223,11 +237,7 @@ public class Compiler extends LittleBaseListener
                         varPrint = prettify.substring(prettify.indexOf('(') + 1, prettify.indexOf(')'));
                     	result = symbols.get(varPrint);
                     	
-                    	if (result.type.equals("STRING")) {
-                            CodeObject assignVarNode = new CodeObject("READS", varPrint);
-                            IR.add(assignVarNode);
-                    	}
-                    	else if (result.type.equals("INT")) {
+                    	if (result.type.equals("INT")) {
                             CodeObject assignVarNode = new CodeObject("READI", varPrint);
                             IR.add(assignVarNode);
                     	}
@@ -259,13 +269,10 @@ public class Compiler extends LittleBaseListener
                     break;
             }
         }
-        for (int i = 0; i < IR.size(); i++) {
-            System.out.println(IR.get(i).toString());
-        }
-
 
         return IR;
     }
+
     public static String[] parseString(String input) {
         String[] tokens = input.split(",");
         List<String> outputList = new ArrayList<String>();
@@ -274,7 +281,12 @@ public class Compiler extends LittleBaseListener
             String token = tokens[i];
             if (token.startsWith("ID(")) {
                 outputList.add(token.substring(3, token.length() - 1));
-            } else if (token.equals("*") || token.equals("+")) {
+            } else if(token.startsWith("FLOATLITERAL(")) {
+                outputList.add(token.substring(13, token.length() - 1));
+            } else if(token.startsWith("INTLITERAL(")) {
+                outputList.add(token.substring(11, token.length() - 1));
+            }
+            else if (token.equals("*") || token.equals("+") || token.equals("/") || token.equals("-")) {
                 outputList.add(token);
             }
         }
@@ -284,6 +296,121 @@ public class Compiler extends LittleBaseListener
         return output;
     }
 
+    public ArrayList<String> generateTiny(ArrayList<CodeObject> IR, Hashtable<String, SymbolData> symbols) {
+        ArrayList<String> tiny = new ArrayList<>();
+        Set<String> keys = symbols.keySet();
+        String instruction = "";
+
+        int register = 0;
+        // setting our declarations is the first step in the tiny language output
+        for (String key : keys) {
+            instruction = "";
+            if(symbols.get(key).type.equals("STRING")) {
+                instruction += "str " + key + " " + symbols.get(key).data;
+            } else {
+                instruction += "var " + key;
+            }
+            tiny.add(instruction);
+        }
+
+        for (int i = 0; i < IR.size(); i++) {
+            instruction = "";
+            String opcode = IR.get(i).opcode;
+            String opOne = IR.get(i).opOne;
+            String opTwo = IR.get(i).opTwo;
+            String result = IR.get(i).result;
+            switch(opcode) {
+                case "STOREI" :
+                case "STOREF" :
+                    if (opOne.contains("$T")) {
+                        register--;
+                        instruction += "move " + "r" + register + " " + result;
+                    } else {
+                        instruction += "move " + opOne + " r" + register;
+                    }
+                    register++;
+                    break;
+                case "READI" :
+                    instruction += "sys readi " + result;
+                    break;
+                case "READF" :
+                    instruction += "sys readr " + result;
+                    break;
+                case "WRITEI" :
+                    instruction += "sys writei " + result;
+                    break;
+                case "WRITEF" :
+                    instruction += "sys writer " + result;
+                    break;
+                case "WRITES" :
+                    instruction += "sys writes " + result;
+                    break;
+                case "ADDI" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "addi " + opTwo + " r" + register;
+                    register++;
+                    break;
+                case "ADDF" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "addr " + opTwo + " r" + register;
+                    register++;
+                    break;
+                case "SUBI" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "subi " + opTwo + " r" + register;
+                    register++;
+                    break;
+                case "SUBF" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "subr " + opTwo + " r" + register;
+                    register++;
+                    break;
+                case "MULTI" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "muli " + opTwo + " r" + register;
+                    register++;
+                    break;
+                case "MULTF" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "mulr " + opTwo + " r" + register;
+                    register++;
+                    break;
+                case "DIVI" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "divi " + opTwo + " r" + register;
+                    register++;
+                    break;
+                case "DIVF" :
+                    instruction += "move " + opOne + " r" + register;
+                    tiny.add(instruction);
+                    instruction = "";
+                    instruction += "divr " + opTwo + " r" + register;
+                    register++;
+                    break;
+
+            }
+            if (!instruction.isEmpty()) {
+                tiny.add(instruction);
+            }
+        }
+        tiny.add("sys halt");
+
+        return tiny;
+    }
 
 }
 class Node {

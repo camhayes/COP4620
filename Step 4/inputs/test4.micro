@@ -1,0 +1,27 @@
+PROGRAM D2R
+BEGIN
+	FLOAT f, g, ra, t1, t2, const, const2, PI;
+	STRING c := "Input Degree: ";
+	STRING o1 := "The degree: ";
+	STRING o2 := "The radian: ";
+	STRING o3 := "The gradian: ";
+	STRING newline := "\n";
+
+	FUNCTION VOID main()
+	BEGIN
+	    PI := 3.14159;
+    	const := 200.0;
+    	const2 := 180.0;
+		WRITE(c, newline);
+		READ(f);
+		t1 := f * PI;
+		ra := t1 / const2;
+		t2 := const / PI;
+		g := ra * t2;
+		WRITE(o1, f, newline);
+		WRITE(o2, ra, newline);
+		WRITE(o3, g, newline);
+
+	END
+
+END

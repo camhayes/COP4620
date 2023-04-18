@@ -1,0 +1,74 @@
+;IR CODE 
+;LABEL main 
+;LINK  
+;STOREF 3.14159 $T1 
+;STOREF $T1 PI 
+;STOREF 200.0 $T2 
+;STOREF $T2 const 
+;STOREF 180.0 $T3 
+;STOREF $T3 const2 
+;WRITES c 
+;WRITES newline 
+;READF f 
+;MULTF f PI $T4 
+;STOREF $T4 t1 
+;DIVF t1 const2 $T5 
+;STOREF $T5 ra 
+;DIVF const PI $T6 
+;STOREF $T6 t2 
+;MULTF ra t2 $T7 
+;STOREF $T7 g 
+;WRITES o1 
+;WRITEF f 
+;WRITES newline 
+;WRITES o2 
+;WRITEF ra 
+;WRITES newline 
+;WRITES o3 
+;WRITEF g 
+;WRITES newline 
+;RET  
+var ra
+str o3 "The gradian: "
+str newline "\n"
+str o2 "The radian: "
+str o1 "The degree: "
+var const
+var t2
+var g
+var t1
+var const2
+var f
+str c "Input Degree: "
+var PI
+move 3.14159 r0
+move r0 PI
+move 200.0 r1
+move r1 const
+move 180.0 r2
+move r2 const2
+sys writes c
+sys writes newline
+sys readr f
+move f r3
+mulr PI r3
+move r3 t1
+move t1 r4
+divr const2 r4
+move r4 ra
+move const r5
+divr PI r5
+move r5 t2
+move ra r6
+mulr t2 r6
+move r6 g
+sys writes o1
+sys writer f
+sys writes newline
+sys writes o2
+sys writer ra
+sys writes newline
+sys writes o3
+sys writer g
+sys writes newline
+sys halt

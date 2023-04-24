@@ -27,13 +27,28 @@ public class Driver {
         //ast.astOut();
         ArrayList<CodeObject> IR = ast.generateIR();
         Hashtable<String, SymbolData> symbols = Compiler.symbols;
+        ArrayList<String> tiny = ast.generateTiny(IR, symbols);
+        ArrayList<String> optimizedTiny = ast.optimizeTiny(tiny);
+
+        // output handling
+
+
         for (int i = 0; i < IR.size(); i++) {
             System.out.println(IR.get(i).toString());
         }
-        ArrayList<String> tiny = ast.generateTiny(IR, symbols);
+        /*
         for (int i = 0; i < tiny.size(); i++) {
             System.out.println(tiny.get(i));
         }
+
+         */
+
+
+        for (int i = 0; i < optimizedTiny.size(); i++) {
+            System.out.println(optimizedTiny.get(i));
+        }
+
+
     }
 
 }

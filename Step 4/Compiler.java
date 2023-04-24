@@ -412,6 +412,41 @@ public class Compiler extends LittleBaseListener
         return tiny;
     }
 
+    public ArrayList<String> optimizeTiny(ArrayList<String> tiny) {
+        ArrayList<String> optimized = new ArrayList<>();
+        Hashtable<String, ArrayList<String>> vars = new Hashtable<>();
+
+        for (int i = 0; i < tiny.size(); i++) {
+            String instruction = tiny.get(i);
+            String[] current = instruction.split(" ");
+            switch (current[0]) {
+                case "var" :
+                    ArrayList<String> registers = new ArrayList<>();
+                    vars.put(current[1], registers);
+                    optimized.add(instruction);
+                    break;
+                case "move" :
+                    // move var register
+
+                    String nextInstruction = tiny.get(i+1);
+                    String[] next = nextInstruction.split(" ");
+                    if (!current[1].matches("r[0-9]+[0-9]*") && current[2].equals(next[1])) {
+                        // if move a r# == ++move r# b, then move a b
+                        optimized.add("move " + current[1] + " " + next[2]);
+                        i++;
+                        continue;
+                    } else {
+                        optimized.add(instruction);
+                    }
+                    break;
+                default :
+                    optimized.add(instruction);
+                    break;
+            }
+        }
+        return optimized;
+    }
+
 }
 class Node {
     String value;
